@@ -1,1 +1,25 @@
-npm run check
+head_tree=$(git rev-parse 'HEAD^{tree}') || exit 1
+verify=0
+
+# The build must see the same tree that Git is about to push.
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_ref" = '(delete)' ] && continue
+  [ "$local_sha" = "$remote_sha" ] && continue
+
+  push_tree=$(git rev-parse "$local_sha^{tree}") || exit 1
+  if [ "$push_tree" != "$head_tree" ]; then
+    printf 'Check out the commit for %s and push it from that checkout.\n' "$remote_ref" >&2
+    exit 1
+  fi
+  verify=1
+done
+
+[ "$verify" -eq 1 ] || exit 0
+
+untracked=$(git ls-files --others --exclude-standard) || exit 1
+if ! git diff --quiet HEAD -- || [ -n "$untracked" ]; then
+  printf '%s\n' 'Commit or stash local changes before pushing so verification checks the committed files.' >&2
+  exit 1
+fi
+
+npm run verify

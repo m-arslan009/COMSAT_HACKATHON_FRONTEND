@@ -1,5 +1,9 @@
 const config = {
-  "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}": ["eslint --fix", "prettier --write"],
+  "*": "secretlint --no-gitignore --no-glob",
+  "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}": [
+    "eslint --fix --max-warnings=0",
+    "prettier --write",
+  ],
   "*.{css,json,md,mdx,yaml,yml}": "prettier --write",
 };
 

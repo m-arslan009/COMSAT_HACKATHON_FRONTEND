@@ -35,6 +35,8 @@ Keep each feature's route, components, hooks, schemas, tests, and data access to
 
 Add shadcn/ui primitives with `npm exec -- shadcn add <component>`.
 
+See [frontend rules](AGENTS.md) for design and implementation standards and the [application map](docs/application-map.md) for routes, dependencies, and change points.
+
 ## Connect the Next.js backend
 
 When the backend is available, clone it alongside this project or into the ignored `.repos/backend` folder. Run it on port `3001` or another available port. Copy `.env.example` to `.env.local` and set `BACKEND_API_URL` to the backend origin. Restart the frontend dev server after changing the value.
@@ -43,8 +45,8 @@ Use `backendFetch()` from `src/lib/backend.ts` in server components or Next.js r
 
 ## Git hooks and checks
 
-- `pre-commit` runs ESLint and Prettier on staged files.
+- `pre-commit` scans staged files for credentials, runs ESLint and Prettier, and checks whitespace.
 - `commit-msg` enforces Conventional Commits, for example `feat: add team registration`.
-- `pre-push` runs the whole-project lint and TypeScript checks.
+- `pre-push` verifies the lockfile, scans for credentials, checks formatting, lint, and types, runs the tests, audits development and runtime dependencies, and builds the app. Push from a clean checkout of the code being sent.
 
-`npm ci` enables the hooks. Run `npm run check` before pushing, `npm run format` to format files, and `npm run build` to check the production build.
+`npm ci` enables the hooks. Run `npm run verify` to run the full gate manually, `npm test` to run the core tests, and `npm run format` to format files. Dependency auditing uses the npm registry. The scoped `minimatch` override addresses [the advisory in shadcn's dependency chain](https://github.com/advisories/GHSA-g3hv-75wg-m249) and can be reviewed when shadcn updates that dependency.
