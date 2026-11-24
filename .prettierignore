@@ -1,0 +1,8 @@
+.next/
+.npm-cache/
+.repos/
+build/
+coverage/
+next-env.d.ts
+out/
+package-lock.json
