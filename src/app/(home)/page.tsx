@@ -1,3 +1,4 @@
+import { AuthActions } from "./_components/auth-actions";
 import { FrontendHealthCard } from "./_components/frontend-health-card";
 
 export default function HomePage() {
@@ -9,6 +10,7 @@ export default function HomePage() {
         </h1>
         <p className="text-lg text-muted-foreground">Frontend starter</p>
       </header>
+      <AuthActions />
       <FrontendHealthCard />
     </main>
   );

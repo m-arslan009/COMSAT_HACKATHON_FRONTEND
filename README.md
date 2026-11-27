@@ -13,6 +13,12 @@ npm run dev
 
 Open `http://localhost:3000`. The frontend health endpoint is `http://localhost:3000/api/health`.
 
+## Accounts (UI only)
+
+The app has sign-in, sign-up, forgot and reset password, a profile page, and a settings page (theme, email, password, signed-in devices, and account deletion). Every form validates with the shared Zod schemas in `src/lib/auth/schemas.ts` and shows errors on each field.
+
+These pages are frontend only until the backend's auth endpoints are agreed. A valid submit completes the UI flow (navigates or shows a success message) and each form marks where the backend call goes with `TODO(backend)`. The profile and settings pages show sample data from `src/app/(account)/_lib/placeholder-user.ts`.
+
 ## Organize by feature
 
 ```text
@@ -21,12 +27,18 @@ src/
     (home)/
       page.tsx
       _components/
+    (auth)/            sign-in, sign-up, forgot-password, reset-password
+    (account)/         profile, settings
     api/
       health/route.ts
     globals.css
     layout.tsx
-  components/ui/
+  components/
+    forms/             shared form fields and status
+    ui/
+  hooks/
   lib/
+    auth/schemas.ts    validation rules
     backend.ts
     utils.ts
 ```
@@ -34,6 +46,8 @@ src/
 Keep each feature's route, components, hooks, schemas, tests, and data access together in its own folder. Use private folders such as `_components` for route-specific code. Route groups such as `(home)` organize routes without changing their URLs. Put reusable shadcn/ui primitives in `src/components/ui` and shared utilities in `src/lib`.
 
 Add shadcn/ui primitives with `npm exec -- shadcn add <component>`.
+
+See [frontend rules](AGENTS.md) for design and implementation standards and the [application map](docs/application-map.md) for routes, dependencies, and change points.
 
 ## Connect the Next.js backend
 
@@ -43,8 +57,8 @@ Use `backendFetch()` from `src/lib/backend.ts` in server components or Next.js r
 
 ## Git hooks and checks
 
-- `pre-commit` runs ESLint and Prettier on staged files.
+- `pre-commit` scans staged files for credentials, runs ESLint and Prettier, and checks whitespace.
 - `commit-msg` enforces Conventional Commits, for example `feat: add team registration`.
-- `pre-push` runs the whole-project lint and TypeScript checks.
+- `pre-push` verifies the lockfile, scans for credentials, checks formatting, lint, and types, runs the tests, audits development and runtime dependencies, and builds the app. Push from a clean checkout of the code being sent.
 
-`npm ci` enables the hooks. Run `npm run check` before pushing, `npm run format` to format files, and `npm run build` to check the production build.
+`npm ci` enables the hooks. Run `npm run verify` to run the full gate manually, `npm test` to run the core tests, and `npm run format` to format files. Dependency auditing uses the npm registry. The scoped `minimatch` override addresses [the advisory in shadcn's dependency chain](https://github.com/advisories/GHSA-g3hv-75wg-m249) and can be reviewed when shadcn updates that dependency.
